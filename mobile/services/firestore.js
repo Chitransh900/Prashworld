@@ -14,8 +14,8 @@ import {
   serverTimestamp,
   arrayUnion,
   arrayRemove,
-  increment,
   writeBatch,
+  setDoc,
 } from 'firebase/firestore';
 import { db } from './firebase';
 
@@ -95,7 +95,7 @@ export const createPost = async (postData) => {
 
   // Increment user's post count
   const userRef = doc(db, 'users', postData.authorId);
-  await updateDoc(userRef, { postCount: increment(1) });
+  await setDoc(userRef, { postCount: increment(1) }, { merge: true });
 
   return { id: docRef.id, ...newPost };
 };
@@ -166,7 +166,7 @@ export const getPostById = async (postId) => {
 export const deletePost = async (postId, authorId) => {
   await deleteDoc(doc(db, 'posts', postId));
   const userRef = doc(db, 'users', authorId);
-  await updateDoc(userRef, { postCount: increment(-1) });
+  await setDoc(userRef, { postCount: increment(-1) }, { merge: true });
 };
 
 /* ============================================
