@@ -1,0 +1,15 @@
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-shell__main {
+  flex: 1;
+  min-height: 100vh;
+}
+
+@media (min-width: 1024px) {
+  .app-shell__main {
+    margin-left: var(--sidebar-width);
+  }
+}

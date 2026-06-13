@@ -1,0 +1,150 @@
+/* ============================================
+   AUTH PAGES — Login & Signup shared styles
+   ============================================ */
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  background: var(--bg);
+}
+
+.auth-page__card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+}
+
+@media (max-width: 480px) {
+  .auth-page__card {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    padding: var(--space-4);
+  }
+}
+
+.auth-page__back {
+  position: absolute;
+  top: var(--space-6);
+  left: var(--space-6);
+  padding: var(--space-2);
+  color: var(--text-muted);
+  border-radius: var(--radius-full);
+  transition: all 0.2s ease;
+}
+
+.auth-page__back:hover {
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+}
+
+.auth-page__header {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+
+.auth-page__logo {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-300));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  margin: 0 auto var(--space-5);
+}
+
+.auth-page__title {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-1);
+}
+
+.auth-page__subtitle {
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.auth-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.auth-page__forgot {
+  align-self: flex-end;
+  font-size: var(--text-xs);
+  color: var(--color-primary-500);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  margin-top: calc(-1 * var(--space-2));
+  transition: color 0.2s ease;
+}
+
+.auth-page__forgot:hover {
+  color: var(--color-primary-400);
+}
+
+.auth-page__switch {
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  margin-top: var(--space-4);
+}
+
+.auth-page__switch a {
+  color: var(--color-primary-500);
+  font-weight: var(--font-semibold);
+  transition: color 0.2s ease;
+}
+
+.auth-page__switch a:hover {
+  color: var(--color-primary-400);
+}
+
+/* ---- Password Strength ---- */
+.password-strength {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.password-strength__bar {
+  flex: 1;
+  height: 3px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.password-strength__fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.password-strength__fill--1 { background: var(--color-error); }
+.password-strength__fill--2 { background: var(--color-warning); }
+.password-strength__fill--3 { background: var(--color-accent-500); }
+.password-strength__fill--4 { background: var(--color-success); }
+
+.password-strength__label {
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+}
+
+.password-strength__label--1 { color: var(--color-error); }
+.password-strength__label--2 { color: var(--color-warning); }
+.password-strength__label--3 { color: var(--color-accent-500); }
+.password-strength__label--4 { color: var(--color-success); }

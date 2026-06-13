@@ -1,0 +1,198 @@
+.create-page__header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backdrop-filter: blur(20px);
+}
+
+.create-page__back {
+  padding: var(--space-2);
+  color: var(--text-primary);
+  border-radius: var(--radius-full);
+  transition: background 0.2s ease;
+}
+
+.create-page__back:hover {
+  background: var(--surface-elevated);
+}
+
+.create-page__title {
+  font-size: var(--text-md);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.create-page__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding-top: var(--space-5);
+}
+
+/* ---- Upload Area ---- */
+.create-page__upload-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-16) var(--space-6);
+  border: 2px dashed var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface-elevated);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.create-page__upload-area:hover {
+  border-color: var(--color-primary-300);
+  background: var(--color-primary-50);
+}
+
+[data-theme="dark"] .create-page__upload-area:hover {
+  background: rgba(45, 138, 62, 0.05);
+}
+
+.create-page__upload-icon {
+  color: var(--text-muted);
+}
+
+.create-page__upload-text {
+  font-size: var(--text-base);
+  font-weight: var(--font-medium);
+  color: var(--text-secondary);
+}
+
+.create-page__upload-hint {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+/* ---- Previews ---- */
+.create-page__previews {
+  display: flex;
+  gap: var(--space-3);
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+}
+
+.create-page__preview-item {
+  position: relative;
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.create-page__preview-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.create-page__preview-remove {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.create-page__preview-remove:hover {
+  background: rgba(194, 61, 61, 0.9);
+}
+
+.create-page__add-more {
+  flex-shrink: 0;
+  width: 120px;
+  height: 120px;
+  border-radius: var(--radius-lg);
+  border: 2px dashed var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.create-page__add-more:hover {
+  border-color: var(--color-primary-300);
+  color: var(--color-primary-500);
+}
+
+/* ---- Fields ---- */
+.create-page__field {
+  position: relative;
+}
+
+.create-page__field-icon {
+  position: absolute;
+  left: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+}
+
+.create-page__field .input:has(~ .create-page__field-icon),
+.create-page__field .create-page__field-icon + .input {
+  padding-left: calc(var(--space-4) + 24px);
+}
+
+.create-page__caption {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.create-page__char-count {
+  position: absolute;
+  bottom: var(--space-2);
+  right: var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+/* ---- Upload Overlay ---- */
+.create-page__overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: backdropFade 0.2s ease;
+}
+
+.create-page__overlay-content {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  padding: var(--space-10);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  box-shadow: var(--shadow-2xl);
+}
+
+.create-page__overlay-content p {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-weight: var(--font-medium);
+}
