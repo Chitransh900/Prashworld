@@ -14,6 +14,7 @@ import {
   serverTimestamp,
   arrayUnion,
   arrayRemove,
+  increment,
   writeBatch,
   setDoc,
 } from 'firebase/firestore';
