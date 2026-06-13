@@ -36,8 +36,9 @@ export default function UserProfileScreen() {
         setProfile(p);
         const result = await getUserPosts(p.uid || p.id);
         setPosts(result.posts);
-        if (user && p.uid !== user.uid) {
-          const following = await checkIsFollowing(user.uid, p.uid);
+        const targetId = p.uid || p.id;
+        if (user && targetId !== user.uid) {
+          const following = await checkIsFollowing(user.uid, targetId);
           setIsFollowing(following);
         }
       } catch {}
@@ -49,15 +50,16 @@ export default function UserProfileScreen() {
   const handleFollow = async () => {
     if (!user || !profile || followLoading) return;
     setFollowLoading(true);
+    const targetId = profile.uid || profile.id;
     try {
       if (isFollowing) {
-        await unfollowUser(user.uid, profile.uid);
+        await unfollowUser(user.uid, targetId);
         setIsFollowing(false);
         setProfile(p => ({ ...p, followerCount: (p.followerCount || 1) - 1 }));
       } else {
         await followUser(
           { uid: user.uid, displayName: currentUserProfile?.displayName, username: currentUserProfile?.username, photoURL: currentUserProfile?.photoURL },
-          profile.uid, profile
+          targetId, profile
         );
         setIsFollowing(true);
         setProfile(p => ({ ...p, followerCount: (p.followerCount || 0) + 1 }));

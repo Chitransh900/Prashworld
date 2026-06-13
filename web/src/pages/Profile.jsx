@@ -43,8 +43,9 @@ const Profile = () => {
         setPosts(result.posts);
 
         // Check following status
-        if (user && !isOwnProfile && profileData.uid) {
-          const following = await checkIsFollowing(user.uid, profileData.uid);
+        const targetId = profileData.uid || profileData.id;
+        if (user && !isOwnProfile && targetId) {
+          const following = await checkIsFollowing(user.uid, targetId);
           setIsFollowing(following);
         }
       } catch (err) {
@@ -61,21 +62,24 @@ const Profile = () => {
     if (!user || !profile || followLoading) return;
     setFollowLoading(true);
 
+    const targetId = profile.uid || profile.id;
+
     try {
       if (isFollowing) {
-        await unfollowUser(user.uid, profile.uid);
+        await unfollowUser(user.uid, targetId);
         setIsFollowing(false);
         setProfile((p) => ({ ...p, followerCount: (p.followerCount || 1) - 1 }));
       } else {
         await followUser(
           { uid: user.uid, displayName: userProfile?.displayName, username: userProfile?.username, photoURL: userProfile?.photoURL },
-          profile.uid,
+          targetId,
           profile
         );
         setIsFollowing(true);
         setProfile((p) => ({ ...p, followerCount: (p.followerCount || 0) + 1 }));
       }
-    } catch {
+    } catch (err) {
+      console.error(err);
       toast.error('Action failed. Please try again.');
     } finally {
       setFollowLoading(false);
