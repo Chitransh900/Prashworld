@@ -58,7 +58,7 @@ export default function ExploreScreen() {
   const renderUserResult = ({ item }) => (
     <TouchableOpacity
       style={styles.resultItem}
-      onPress={() => router.push(`/user/${item.username}`)}
+      onPress={() => router.push(`/user/${item.id}`)}
       activeOpacity={0.7}
     >
       <Avatar uri={item.photoURL} name={item.displayName} size="md" />

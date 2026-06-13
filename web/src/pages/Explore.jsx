@@ -92,7 +92,7 @@ const Explore = () => {
                   <button
                     key={user.id}
                     className="explore-page__result-item"
-                    onClick={() => navigate(`/user/${user.username}`)}
+                    onClick={() => navigate(`/user/${user.id}`)}
                   >
                     {user.photoURL ? (
                       <img src={user.photoURL} alt={user.displayName} className="avatar avatar--md" />

@@ -100,7 +100,7 @@ const PostCard = ({ post, onDelete }) => {
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.author}
-          onPress={() => router.push(`/user/${post.authorUsername}`)}
+          onPress={() => router.push(`/user/${post.authorId}`)}
           activeOpacity={0.7}
         >
           <Avatar uri={post.authorPhotoURL} name={post.authorName} size="md" />
@@ -131,9 +131,26 @@ const PostCard = ({ post, onDelete }) => {
         </View>
       )}
 
-      {/* Image */}
+      {/* Image with Double Tap to Like */}
       {images.length > 0 && (
-        <Pressable onPress={() => router.push(`/post/${post.id}`)}>
+        <Pressable 
+          onPress={(e) => {
+            const time = new Date().getTime();
+            const delta = time - (e._lastPress || 0);
+            const DOUBLE_PRESS_DELAY = 300;
+            if (delta < DOUBLE_PRESS_DELAY) {
+              handleLike();
+            } else {
+              e._lastPress = time;
+              // Add slight delay for single press to allow double press detection
+              setTimeout(() => {
+                if (new Date().getTime() - e._lastPress >= DOUBLE_PRESS_DELAY) {
+                  router.push(`/post/${post.id}`);
+                }
+              }, DOUBLE_PRESS_DELAY);
+            }
+          }}
+        >
           <Image
             source={{ uri: images[0] }}
             style={styles.image}

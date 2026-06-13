@@ -34,10 +34,15 @@ export const getUserById = async (uid) => {
 };
 
 /**
- * Get user by username
+ * Get user by username or ID
  */
-export const getUserByUsername = async (username) => {
-  const usernameRef = doc(db, 'usernames', username);
+export const getUserByUsername = async (identifier) => {
+  // Try by ID first
+  const user = await getUserById(identifier);
+  if (user) return user;
+
+  // Try by username
+  const usernameRef = doc(db, 'usernames', identifier);
   const usernameSnap = await getDoc(usernameRef);
   if (!usernameSnap.exists()) return null;
   return getUserById(usernameSnap.data().uid);

@@ -86,7 +86,7 @@ const PostCard = ({ post, onDelete }) => {
       <header className="post-card__header">
         <div
           className="post-card__author"
-          onClick={() => navigate(`/user/${post.authorUsername}`)}
+          onClick={() => navigate(`/user/${post.authorId}`)}
           role="button"
           tabIndex={0}
         >
@@ -135,13 +135,12 @@ const PostCard = ({ post, onDelete }) => {
 
       {/* Image */}
       {images.length > 0 && (
-        <div className="post-card__image-container">
+        <div className="post-card__image-container" onDoubleClick={handleLike}>
           <img
             src={images[currentImageIndex]}
             alt={post.caption || 'Nature photograph'}
             className="post-card__image"
             loading="lazy"
-            onDoubleClick={handleLike}
           />
           {images.length > 1 && (
             <div className="post-card__image-dots">
