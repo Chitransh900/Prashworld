@@ -36,7 +36,7 @@
 
 .post-detail__content {
   flex: 1;
-  padding-bottom: 80px;
+  padding-bottom: calc(var(--bottomnav-height, 60px) + 80px);
 }
 
 .post-detail__image-wrap {
