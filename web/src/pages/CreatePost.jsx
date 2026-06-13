@@ -74,7 +74,8 @@ const CreatePost = () => {
       toast.success('Shared to the wild! 🌿');
       navigate('/home');
     } catch (err) {
-      toast.error('Failed to create post. Please try again.');
+      console.error(err);
+      toast.error(`Error: ${err.message || 'Failed to create post'}`);
     } finally {
       setUploading(false);
     }

@@ -68,8 +68,9 @@ const PostCard = ({ post, onDelete }) => {
       await deletePost(post.id, post.authorId);
       toast.success('Post deleted');
       onDelete?.(post.id);
-    } catch {
-      toast.error('Failed to delete post');
+    } catch (err) {
+      console.error(err);
+      toast.error(`Error: ${err.message || 'Failed to delete post'}`);
     }
     setShowMenu(false);
   };
