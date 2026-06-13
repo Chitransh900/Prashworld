@@ -91,8 +91,9 @@ export default function CreatePostScreen() {
       });
       toast.success('Shared to the wild! 🌿');
       router.replace('/(tabs)');
-    } catch {
-      toast.error('Failed to create post');
+    } catch (err) {
+      console.error(err);
+      toast.error(`Error: ${err.message || 'Failed to create post'}`);
     } finally {
       setUploading(false);
     }
