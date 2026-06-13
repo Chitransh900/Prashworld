@@ -1,6 +1,6 @@
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
-import { storage } from './firebase';
+
+const IMGBB_API_KEY = 'cf83dd6ca670d089bd03ddb55f04e858';
 
 /**
  * Compress an image before upload
@@ -9,17 +9,35 @@ const compressImage = async (uri) => {
   const result = await manipulateAsync(
     uri,
     [{ resize: { width: 1200 } }],
-    { compress: 0.7, format: SaveFormat.WEBP }
+    { compress: 0.7, format: SaveFormat.JPEG }
   );
   return result.uri;
 };
 
 /**
- * Convert a URI to a blob for upload
+ * Upload an image to ImgBB
  */
-const uriToBlob = async (uri) => {
-  const response = await fetch(uri);
-  return await response.blob();
+const uploadToImgBB = async (uri) => {
+  const formData = new FormData();
+  formData.append('image', {
+    uri: uri,
+    name: 'image.jpg',
+    type: 'image/jpeg',
+  });
+
+  const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  const result = await response.json();
+  if (result.success) {
+    return result.data.url; // Returns the direct image URL hosted on ImgBB
+  }
+  throw new Error('Image upload failed');
 };
 
 /**
@@ -27,27 +45,16 @@ const uriToBlob = async (uri) => {
  */
 export const uploadAvatar = async (userId, imageUri) => {
   const compressedUri = await compressImage(imageUri);
-  const blob = await uriToBlob(compressedUri);
-  const storageRef = ref(storage, `avatars/${userId}/profile.webp`);
-  const snapshot = await uploadBytes(storageRef, blob);
-  return await getDownloadURL(snapshot.ref);
+  return await uploadToImgBB(compressedUri);
 };
 
 /**
  * Upload post images (array of URIs)
  */
 export const uploadPostImages = async (userId, imageUris) => {
-  const uploadPromises = imageUris.map(async (uri, index) => {
+  const uploadPromises = imageUris.map(async (uri) => {
     const compressedUri = await compressImage(uri);
-    const blob = await uriToBlob(compressedUri);
-    const timestamp = Date.now();
-    const random = Math.random().toString(36).substring(7);
-    const storageRef = ref(
-      storage,
-      `posts/${userId}/${timestamp}_${index}_${random}.webp`
-    );
-    const snapshot = await uploadBytes(storageRef, blob);
-    return await getDownloadURL(snapshot.ref);
+    return await uploadToImgBB(compressedUri);
   });
   return Promise.all(uploadPromises);
 };

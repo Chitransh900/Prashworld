@@ -1,6 +1,6 @@
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from './firebase';
 import imageCompression from 'browser-image-compression';
+
+const IMGBB_API_KEY = 'cf83dd6ca670d089bd03ddb55f04e858';
 
 /**
  * Compress an image file before upload
@@ -10,7 +10,7 @@ const compressImage = async (file, maxSizeMB = 0.5, maxWidthOrHeight = 1920) => 
     maxSizeMB,
     maxWidthOrHeight,
     useWebWorker: true,
-    fileType: 'image/webp',
+    fileType: 'image/jpeg',
   };
 
   try {
@@ -22,12 +22,22 @@ const compressImage = async (file, maxSizeMB = 0.5, maxWidthOrHeight = 1920) => 
 };
 
 /**
- * Generate a unique filename
+ * Upload an image to ImgBB
  */
-const generateFilename = (prefix = 'img') => {
-  const timestamp = Date.now();
-  const random = Math.random().toString(36).substring(2, 8);
-  return `${prefix}_${timestamp}_${random}.webp`;
+const uploadToImgBB = async (file) => {
+  const formData = new FormData();
+  formData.append('image', file);
+
+  const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  const result = await response.json();
+  if (result.success) {
+    return result.data.url;
+  }
+  throw new Error('Image upload failed');
 };
 
 /**
@@ -35,10 +45,7 @@ const generateFilename = (prefix = 'img') => {
  */
 export const uploadAvatar = async (userId, file) => {
   const compressed = await compressImage(file, 0.3, 512);
-  const filename = `profile.webp`;
-  const storageRef = ref(storage, `avatars/${userId}/${filename}`);
-  await uploadBytes(storageRef, compressed);
-  return getDownloadURL(storageRef);
+  return await uploadToImgBB(compressed);
 };
 
 /**
@@ -46,10 +53,7 @@ export const uploadAvatar = async (userId, file) => {
  */
 export const uploadCover = async (userId, file) => {
   const compressed = await compressImage(file, 0.5, 1920);
-  const filename = `cover.webp`;
-  const storageRef = ref(storage, `covers/${userId}/${filename}`);
-  await uploadBytes(storageRef, compressed);
-  return getDownloadURL(storageRef);
+  return await uploadToImgBB(compressed);
 };
 
 /**
@@ -57,10 +61,7 @@ export const uploadCover = async (userId, file) => {
  */
 export const uploadPostImage = async (userId, file) => {
   const compressed = await compressImage(file, 0.5, 1920);
-  const filename = generateFilename('post');
-  const storageRef = ref(storage, `posts/${userId}/${filename}`);
-  await uploadBytes(storageRef, compressed);
-  return getDownloadURL(storageRef);
+  return await uploadToImgBB(compressed);
 };
 
 /**
