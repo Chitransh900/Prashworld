@@ -103,14 +103,13 @@ export const fontSize = {
   '3xl': 40,
 };
 
-/** @type {const} */
 export const fontWeight = {
   regular: '400',
   medium: '500',
   semibold: '600',
   bold: '700',
   extrabold: '800',
-};
+} as const;
 
 export const lightTheme = {
   bg: colors.neutral[50],

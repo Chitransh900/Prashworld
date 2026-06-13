@@ -54,6 +54,7 @@ export const ToastProvider = ({ children }) => {
   );
 };
 
+/** @returns {any} */
 export const useToast = () => useContext(ToastContext);
 
 const styles = StyleSheet.create({

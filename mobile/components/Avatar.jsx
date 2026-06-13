@@ -21,7 +21,7 @@ const fontSizeMap = {
   '2xl': 42,
 };
 
-const Avatar = ({ uri, name, size = 'md', style }) => {
+const Avatar = ({ uri, name, size = 'md', style = null }) => {
   const dimension = sizeMap[size] || sizeMap.md;
   const fs = fontSizeMap[size] || fontSizeMap.md;
 
