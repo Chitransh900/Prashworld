@@ -184,10 +184,10 @@ export const deletePost = async (postId, authorId) => {
  */
 export const likePost = async (postId, userId) => {
   const postRef = doc(db, 'posts', postId);
-  await updateDoc(postRef, {
+  await setDoc(postRef, {
     likes: arrayUnion(userId),
     likeCount: increment(1),
-  });
+  }, { merge: true });
 };
 
 /**
@@ -195,10 +195,10 @@ export const likePost = async (postId, userId) => {
  */
 export const unlikePost = async (postId, userId) => {
   const postRef = doc(db, 'posts', postId);
-  await updateDoc(postRef, {
+  await setDoc(postRef, {
     likes: arrayRemove(userId),
     likeCount: increment(-1),
-  });
+  }, { merge: true });
 };
 
 /* ============================================
@@ -275,10 +275,10 @@ export const followUser = async (currentUser, targetUserId, targetUserData) => {
 
   // Update counts
   const currentUserRef = doc(db, 'users', currentUser.uid);
-  batch.update(currentUserRef, { followingCount: increment(1) });
+  batch.set(currentUserRef, { followingCount: increment(1) }, { merge: true });
 
   const targetUserRef = doc(db, 'users', targetUserId);
-  batch.update(targetUserRef, { followerCount: increment(1) });
+  batch.set(targetUserRef, { followerCount: increment(1) }, { merge: true });
 
   await batch.commit();
 };
@@ -295,11 +295,12 @@ export const unfollowUser = async (currentUserId, targetUserId) => {
   const followerRef = doc(db, 'users', targetUserId, 'followers', currentUserId);
   batch.delete(followerRef);
 
+  // Update counts
   const currentUserRef = doc(db, 'users', currentUserId);
-  batch.update(currentUserRef, { followingCount: increment(-1) });
+  batch.set(currentUserRef, { followingCount: increment(-1) }, { merge: true });
 
   const targetUserRef = doc(db, 'users', targetUserId);
-  batch.update(targetUserRef, { followerCount: increment(-1) });
+  batch.set(targetUserRef, { followerCount: increment(-1) }, { merge: true });
 
   await batch.commit();
 };
