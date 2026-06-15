@@ -1,0 +1,120 @@
+.share-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.share-modal {
+  background-color: var(--surface);
+  border-radius: var(--radius-xl);
+  width: 90%;
+  max-width: 400px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+}
+
+.share-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border);
+}
+
+.share-modal__header h2 {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.share-modal__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-2) 0;
+}
+
+.share-modal__loading,
+.share-modal__empty {
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.share-modal__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.share-chat-item {
+  display: flex;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  gap: var(--space-3);
+  transition: background-color 0.2s;
+}
+
+.share-chat-item:hover {
+  background-color: var(--surface-elevated);
+}
+
+.share-chat-item__name {
+  flex: 1;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.share-btn {
+  background-color: var(--color-info);
+  color: white;
+  border: none;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  cursor: pointer;
+  min-width: 70px;
+  display: flex;
+  justify-content: center;
+}
+
+.share-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.share-modal__footer {
+  padding: var(--space-4);
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: center;
+}
+
+.share-external-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background-color: var(--surface-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.share-external-btn:hover {
+  background-color: var(--border);
+}

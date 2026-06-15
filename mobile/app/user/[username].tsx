@@ -5,10 +5,10 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ArrowLeft, Share2, Grid3X3, MapPin, X } from 'lucide-react-native';
+import { ArrowLeft, Share2, Grid3X3, MapPin, X, MessageSquare } from 'lucide-react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { getUserByUsername, getUserPosts, checkIsFollowing, followUser, unfollowUser, getFollowers, getFollowing } from '../../services/firestore';
+import { getUserByUsername, getUserPosts, checkIsFollowing, followUser, unfollowUser, getFollowers, getFollowing, getOrCreateChat } from '../../services/firestore';
 import Avatar from '../../components/Avatar';
 import { formatCount } from '../../utils/formatters';
 import { colors, spacing, radius, fontSize, fontWeight } from '../../utils/theme';
@@ -36,7 +36,7 @@ export default function UserProfileScreen() {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const p = await getUserByUsername(username);
+        const p: any = await getUserByUsername(username);
         if (!p) { router.back(); return; }
         setProfile(p);
         const result = await getUserPosts(p.uid || p.id);
@@ -93,6 +93,14 @@ export default function UserProfileScreen() {
     try { await Share.share({ message: `Check out ${profile?.displayName} on Prashworld!` }); } catch {}
   };
 
+  const handleMessage = async () => {
+    if (!user || !profile) return;
+    try {
+      const chat = await getOrCreateChat(currentUserProfile, profile);
+      router.push(`/messages/${chat.id}` as any);
+    } catch { toast.error('Failed to start chat'); }
+  };
+
   if (loading) return <View style={styles.loader}><ActivityIndicator size="large" color={colors.primary[500]} /></View>;
   if (!profile) return null;
 
@@ -138,6 +146,11 @@ export default function UserProfileScreen() {
             <Text style={[styles.followBtnText, isFollowing && styles.followingBtnText]}>
               {followLoading ? '...' : isFollowing ? 'Following' : 'Follow'}
             </Text>
+          </TouchableOpacity>
+        )}
+        {!isOwnProfile && (
+          <TouchableOpacity style={styles.shareBtn} onPress={handleMessage}>
+            <MessageSquare size={18} color={colors.neutral[700]} strokeWidth={1.75} />
           </TouchableOpacity>
         )}
         <TouchableOpacity style={styles.shareBtn} onPress={handleShare}>
@@ -198,7 +211,7 @@ export default function UserProfileScreen() {
                       router.push(`/user/${item.username || item.id}`);
                     }}
                   >
-                    <Avatar url={item.photoURL} size={40} name={item.displayName} />
+                    <Avatar uri={item.photoURL} size="sm" name={item.displayName} />
                     <View style={styles.modalUserInfo}>
                       <Text style={styles.modalUserName}>{item.displayName}</Text>
                       <Text style={styles.modalUserUsername}>@{item.username}</Text>

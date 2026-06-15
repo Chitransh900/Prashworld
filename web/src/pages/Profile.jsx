@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Share2, Grid3X3, Settings, X } from 'lucide-react';
+import { ArrowLeft, MapPin, Share2, Grid3X3, Settings, X, MessageSquare } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
-import { getUserByUsername, getUserById, getUserPosts, checkIsFollowing, followUser, unfollowUser, getFollowers, getFollowing } from '../services/firestore';
+import { getUserByUsername, getUserById, getUserPosts, checkIsFollowing, followUser, unfollowUser, getFollowers, getFollowing, getOrCreateChat } from '../services/firestore';
 import { formatCount, getInitials, getProfileURL } from '../utils/formatters';
 import './Profile.css';
 
@@ -128,6 +128,16 @@ const Profile = () => {
     }
   };
 
+  const handleMessage = async () => {
+    if (!user || !profile) return;
+    try {
+      const chat = await getOrCreateChat(userProfile, profile);
+      navigate(`/messages/${chat.id}`);
+    } catch (err) {
+      toast.error('Failed to start chat');
+    }
+  };
+
   if (loading) {
     return (
       <div className="profile-page">
@@ -232,6 +242,13 @@ const Profile = () => {
                   ) : (
                     'Follow'
                   )}
+                </button>
+                <button
+                  className="btn btn--secondary"
+                  onClick={handleMessage}
+                  aria-label="Message user"
+                >
+                  <MessageSquare size={18} strokeWidth={1.75} />
                 </button>
                 <button
                   className="btn btn--secondary"

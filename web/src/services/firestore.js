@@ -17,6 +17,7 @@ import {
   increment,
   writeBatch,
   setDoc,
+  onSnapshot,
 } from 'firebase/firestore';
 import { db } from './firebase';
 
@@ -345,4 +346,136 @@ export const getSuggestedUsers = async (currentUserId, maxResults = 5) => {
   return snapshot.docs
     .map((doc) => ({ id: doc.id, ...doc.data() }))
     .filter((user) => user.uid !== currentUserId);
+};
+
+/* ============================================
+   CHAT OPERATIONS
+   ============================================ */
+
+/**
+ * Get or create a chat between two users
+ */
+export const getOrCreateChat = async (currentUser, targetUser) => {
+  const chatsRef = collection(db, 'chats');
+  
+  // Check if chat exists where both users are participants
+  // We can query array-contains for one user, and filter in memory for the other
+  const q = query(chatsRef, where('participants', 'array-contains', currentUser.uid));
+  const snapshot = await getDocs(q);
+  
+  const existingChat = snapshot.docs.find((doc) => {
+    const data = doc.data();
+    return data.participants.includes(targetUser.id || targetUser.uid);
+  });
+
+  if (existingChat) {
+    return { id: existingChat.id, ...existingChat.data() };
+  }
+
+  // Create new chat
+  const newChat = {
+    participants: [currentUser.uid, targetUser.id || targetUser.uid],
+    participantDetails: {
+      [currentUser.uid]: {
+        displayName: currentUser.displayName || '',
+        photoURL: currentUser.photoURL || null,
+        username: currentUser.username || ''
+      },
+      [targetUser.id || targetUser.uid]: {
+        displayName: targetUser.displayName || '',
+        photoURL: targetUser.photoURL || null,
+        username: targetUser.username || ''
+      }
+    },
+    lastMessage: '',
+    lastMessageTime: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
+
+  const docRef = await addDoc(chatsRef, newChat);
+  return { id: docRef.id, ...newChat };
+};
+
+/**
+ * Send a message in a chat
+ */
+export const sendMessage = async (chatId, senderId, text) => {
+  try {
+    const messagesRef = collection(db, 'chats', chatId, 'messages');
+    const chatRef = doc(db, 'chats', chatId);
+
+    const batch = writeBatch(db);
+
+    const newMessageRef = doc(messagesRef);
+    batch.set(newMessageRef, {
+      text,
+      senderId,
+      createdAt: serverTimestamp(),
+      read: false
+    });
+
+    batch.set(chatRef, {
+      lastMessage: text,
+      lastMessageTime: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      isAI: chatId.startsWith('ai-')
+    }, { merge: true });
+
+    await batch.commit();
+  } catch (error) {
+    console.error('Error sending message:', error);
+    throw error;
+  }
+};
+
+// Delete a chat completely
+export const deleteChat = async (chatId) => {
+  try {
+    const chatRef = doc(db, 'chats', chatId);
+    await deleteDoc(chatRef);
+  } catch (error) {
+    console.error('Error deleting chat:', error);
+    throw error;
+  }
+};
+
+// Delete a specific message in a chat
+export const deleteMessage = async (chatId, messageId) => {
+  try {
+    const messageRef = doc(db, 'chats', chatId, 'messages', messageId);
+    await deleteDoc(messageRef);
+  } catch (error) {
+    console.error('Error deleting message:', error);
+    throw error;
+  }
+};
+
+/**
+ * Subscribe to user's chats
+ */
+export const subscribeToChats = (userId, callback) => {
+  const chatsRef = collection(db, 'chats');
+  const q = query(
+    chatsRef,
+    where('participants', 'array-contains', userId),
+    orderBy('updatedAt', 'desc')
+  );
+
+  return onSnapshot(q, (snapshot) => {
+    const chats = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    callback(chats);
+  });
+};
+
+/**
+ * Subscribe to messages in a chat
+ */
+export const subscribeToMessages = (chatId, callback) => {
+  const messagesRef = collection(db, 'chats', chatId, 'messages');
+  const q = query(messagesRef, orderBy('createdAt', 'asc'));
+
+  return onSnapshot(q, (snapshot) => {
+    const messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    callback(messages);
+  });
 };

@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "browser-image-compression": "^2.0.2",
     "firebase": "^12.14.0",
     "lucide-react": "^1.18.0",

@@ -5,6 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
 import { likePost, unlikePost, deletePost } from '../../services/firestore';
 import { formatTimeAgo, formatCount, getInitials, getPostURL } from '../../utils/formatters';
+import ShareModal from './ShareModal';
 import './PostCard.css';
 
 const PostCard = ({ post, onDelete }) => {
@@ -15,6 +16,7 @@ const PostCard = ({ post, onDelete }) => {
   const [likeCount, setLikeCount] = useState(post.likeCount || 0);
   const [likeAnimating, setLikeAnimating] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [captionExpanded, setCaptionExpanded] = useState(false);
 
@@ -44,22 +46,8 @@ const PostCard = ({ post, onDelete }) => {
     }
   }, [isLiked, post.id, user]);
 
-  const handleShare = async () => {
-    const url = getPostURL(post.id);
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `${post.authorName} on Prashworld`,
-          text: post.caption?.slice(0, 100) || 'Check out this nature post',
-          url,
-        });
-      } catch {
-        // User cancelled share
-      }
-    } else {
-      await navigator.clipboard.writeText(url);
-      toast.success('Link copied to clipboard');
-    }
+  const handleShare = () => {
+    setShowShareModal(true);
   };
 
   const handleDelete = async () => {
@@ -225,6 +213,13 @@ const PostCard = ({ post, onDelete }) => {
 
       {/* Timestamp */}
       <time className="post-card__time">{formatTimeAgo(post.createdAt)}</time>
+
+      {/* Share Modal */}
+      <ShareModal 
+        post={post} 
+        isOpen={showShareModal} 
+        onClose={() => setShowShareModal(false)} 
+      />
     </article>
   );
 };

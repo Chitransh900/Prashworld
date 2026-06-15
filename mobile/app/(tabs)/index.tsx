@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, RefreshControl, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Leaf } from 'lucide-react-native';
+import { router } from 'expo-router';
+import { Leaf, MessageSquare } from 'lucide-react-native';
 import { getExplorePosts } from '../../services/firestore';
 import PostCard from '../../components/PostCard';
 import { colors, spacing, fontSize, fontWeight, APP_NAME } from '../../utils/theme';
@@ -65,8 +66,13 @@ export default function HomeScreen() {
     <View style={styles.container}>
       {/* Top Bar */}
       <View style={[styles.topBar, { paddingTop: insets.top + spacing[2] }]}>
-        <Leaf size={22} color={colors.primary[500]} strokeWidth={2} />
-        <Text style={styles.topBarTitle}>{APP_NAME}</Text>
+        <View style={styles.topBarLeft}>
+          <Leaf size={22} color={colors.primary[500]} strokeWidth={2} />
+          <Text style={styles.topBarTitle}>{APP_NAME}</Text>
+        </View>
+        <TouchableOpacity onPress={() => router.push('/messages' as any)} style={styles.messageBtn}>
+          <MessageSquare size={24} color={colors.neutral[900]} strokeWidth={1.75} />
+        </TouchableOpacity>
       </View>
 
       {loading ? (
@@ -109,12 +115,20 @@ const styles = StyleSheet.create({
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing[2],
+    justifyContent: 'space-between',
     paddingHorizontal: spacing[4],
     paddingBottom: spacing[3],
     backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: colors.neutral[150],
+  },
+  topBarLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing[2],
+  },
+  messageBtn: {
+    padding: spacing[1],
   },
   topBarTitle: {
     fontSize: fontSize.lg,

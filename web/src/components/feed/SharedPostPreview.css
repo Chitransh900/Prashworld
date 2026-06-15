@@ -1,0 +1,51 @@
+.shared-post-loading,
+.shared-post-error {
+  padding: var(--space-2);
+  font-style: italic;
+  font-size: var(--text-xs);
+  opacity: 0.8;
+}
+
+.shared-post-preview {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--surface-elevated);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  width: 200px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+}
+
+.shared-post-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.shared-post-details {
+  padding: var(--space-2) var(--space-3);
+  display: flex;
+  flex-direction: column;
+}
+
+.shared-post-author {
+  font-weight: 600;
+  font-size: var(--text-xs);
+  color: var(--text-primary);
+}
+
+.shared-post-caption {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  margin-top: var(--space-1);
+}
+
+.message-mine .shared-post-preview {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.message-mine .shared-post-author,
+.message-mine .shared-post-caption {
+  color: white;
+}

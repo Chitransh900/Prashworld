@@ -12,6 +12,7 @@ import Profile from './pages/Profile';
 import PostDetail from './pages/PostDetail';
 import EditProfile from './pages/EditProfile';
 import Settings from './pages/Settings';
+import Messages from './pages/Messages';
 import NotFound from './pages/NotFound';
 import { Leaf } from 'lucide-react';
 
@@ -81,6 +82,8 @@ const App = () => {
               <Route path="/profile" element={<Profile />} />
               <Route path="/user/:username" element={<Profile />} />
               <Route path="/post/:postId" element={<PostDetail />} />
+              <Route path="/messages" element={<Messages />} />
+              <Route path="/messages/:chatId" element={<Messages />} />
               <Route path="/settings" element={<Settings />} />
               <Route path="/settings/profile" element={<EditProfile />} />
             </Route>

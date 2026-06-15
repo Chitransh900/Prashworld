@@ -18,6 +18,7 @@ import { useToast } from '../contexts/ToastContext';
 import { likePost, unlikePost, deletePost } from '../services/firestore';
 import { formatTimeAgo, formatCount } from '../utils/formatters';
 import Avatar from './Avatar';
+import ShareSheet from './ShareSheet';
 import { colors, spacing, radius, fontSize, fontWeight } from '../utils/theme';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -30,6 +31,7 @@ const PostCard = ({ post, onDelete }) => {
   const [scaleAnim] = useState(new Animated.Value(1));
   const [captionExpanded, setCaptionExpanded] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const [showShare, setShowShare] = useState(false);
 
   const handleLike = useCallback(async () => {
     if (!user) return;
@@ -61,12 +63,8 @@ const PostCard = ({ post, onDelete }) => {
     }
   }, [isLiked, post.id, user, scaleAnim]);
 
-  const handleShare = async () => {
-    try {
-      await Share.share({
-        message: `Check out ${post.authorName}'s nature post on Prashworld!`,
-      });
-    } catch { /* cancelled */ }
+  const handleShare = () => {
+    setShowShare(true);
   };
 
   const handleDelete = () => {
@@ -214,6 +212,12 @@ const PostCard = ({ post, onDelete }) => {
 
       {/* Time */}
       <Text style={styles.time}>{formatTimeAgo(post.createdAt)}</Text>
+
+      <ShareSheet 
+        post={post}
+        visible={showShare}
+        onClose={() => setShowShare(false)}
+      />
     </View>
   );
 };

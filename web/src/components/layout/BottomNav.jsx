@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Home, Search, PlusCircle, Heart, User } from 'lucide-react';
+import { Home, Search, PlusCircle, Heart, User, MessageSquare } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import './BottomNav.css';
 
@@ -11,7 +11,7 @@ const BottomNav = () => {
     { path: '/home', icon: Home, label: 'Home' },
     { path: '/explore', icon: Search, label: 'Explore' },
     { path: '/create', icon: PlusCircle, label: 'Create', isCreate: true },
-    { path: '/activity', icon: Heart, label: 'Activity' },
+    { path: '/messages', icon: MessageSquare, label: 'Messages' },
     { path: '/profile', icon: User, label: 'Profile' },
   ];
 
