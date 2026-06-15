@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { Home, Search, PlusCircle, Heart, User, MessageSquare } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import './BottomNav.css';
@@ -6,6 +6,7 @@ import './BottomNav.css';
 const BottomNav = () => {
   const { userProfile } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const navItems = [
     { path: '/home', icon: Home, label: 'Home' },
@@ -14,6 +15,11 @@ const BottomNav = () => {
     { path: '/messages', icon: MessageSquare, label: 'Messages' },
     { path: '/profile', icon: User, label: 'Profile' },
   ];
+
+  // Hide BottomNav when inside a specific chat thread
+  if (location.pathname.startsWith('/messages/') && location.pathname.length > '/messages/'.length) {
+    return null;
+  }
 
   return (
     <nav className="bottom-nav" aria-label="Main navigation">
