@@ -78,13 +78,25 @@ service cloud.firestore {
     
     // CHATS COLLECTION
     match /chats/{chatId} {
-      allow read, update, delete: if isAuthenticated() && request.auth.uid in resource.data.participants;
-      allow create: if isAuthenticated() && request.auth.uid in request.resource.data.participants;
+      // Helper to check if it's an AI chat for the current user
+      function isOwnAIChat() {
+        return chatId == 'ai-' + request.auth.uid;
+      }
       
+      allow read, update, delete: if isAuthenticated() && (request.auth.uid in resource.data.participants || isOwnAIChat());
+      allow create: if isAuthenticated() && (request.auth.uid in request.resource.data.participants || isOwnAIChat());
+      
+      // SUBCOLLECTION: MESSAGES
       match /messages/{messageId} {
-        allow read: if isAuthenticated() && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants;
-        allow create: if isAuthenticated() && request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants && request.resource.data.senderId == request.auth.uid;
-        allow delete: if isAuthenticated() && resource.data.senderId == request.auth.uid;
+        allow read: if isAuthenticated() && (
+          request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants || 
+          isOwnAIChat()
+        );
+        allow create: if isAuthenticated() && (
+          (request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.participants && request.resource.data.senderId == request.auth.uid) || 
+          isOwnAIChat()
+        );
+        allow delete: if isAuthenticated() && (resource.data.senderId == request.auth.uid || isOwnAIChat());
       }
     }
   }

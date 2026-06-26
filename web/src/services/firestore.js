@@ -420,7 +420,8 @@ export const sendMessage = async (chatId, senderId, text) => {
       lastMessage: text,
       lastMessageTime: serverTimestamp(),
       updatedAt: serverTimestamp(),
-      isAI: chatId.startsWith('ai-')
+      isAI: chatId.startsWith('ai-'),
+      participants: chatId.startsWith('ai-') ? [senderId === 'prashworld-ai' ? chatId.replace('ai-', '') : senderId] : undefined
     }, { merge: true });
 
     await batch.commit();
@@ -459,12 +460,17 @@ export const subscribeToChats = (userId, callback) => {
   const chatsRef = collection(db, 'chats');
   const q = query(
     chatsRef,
-    where('participants', 'array-contains', userId),
-    orderBy('updatedAt', 'desc')
+    where('participants', 'array-contains', userId)
   );
 
   return onSnapshot(q, (snapshot) => {
     const chats = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    // Sort in memory to avoid needing a composite index
+    chats.sort((a, b) => {
+      const timeA = a.updatedAt?.toMillis?.() || 0;
+      const timeB = b.updatedAt?.toMillis?.() || 0;
+      return timeB - timeA;
+    });
     callback(chats);
   });
 };
