@@ -159,7 +159,7 @@ const Messages = () => {
               <p>No messages yet</p>
             </div>
           ) : (
-            chats.filter(chat => chat.id !== aiChatId).map((chat) => {
+            chats.filter(chat => !chat.isAI).map((chat) => {
               const other = getOtherParticipant(chat);
               if (!other) return null;
               const isActive = chat.id === chatId;

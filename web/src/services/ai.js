@@ -10,7 +10,7 @@ export const generateAIResponse = async (prompt) => {
   try {
     if (!API_KEY) throw new Error("Gemini API key is missing");
     
-    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const fullPrompt = `${SYSTEM_PROMPT}\n\nUser: ${prompt}\nAI:`;
     
     const result = await model.generateContent(fullPrompt);
@@ -72,7 +72,7 @@ export const analyzeImageForTags = async (imageFile) => {
   try {
     if (!API_KEY) throw new Error("Gemini API key is missing");
 
-    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const imagePart = await fileToGenerativePart(imageFile);
 
     const result = await model.generateContent([GALLERY_ANALYSIS_PROMPT, imagePart]);
@@ -113,7 +113,7 @@ export const extractSearchKeywords = async (query) => {
   try {
     if (!API_KEY) throw new Error("Gemini API key is missing");
 
-    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     const prompt = `Given this search query for an image gallery: "${query}"
 
 Extract the key visual concepts the user is looking for. Return ONLY a JSON array of lowercase keywords that would match image tags.
