@@ -320,3 +320,16 @@
   font-size: var(--text-xs);
   color: var(--text-muted);
 }
+
+/* ---- Utility classes ---- */
+.profile-page__topbar-spacer {
+  width: 36px;
+}
+
+.avatar-placeholder--lg-text {
+  font-size: 28px;
+}
+
+.avatar-placeholder--sm-text {
+  font-size: 12px;
+}

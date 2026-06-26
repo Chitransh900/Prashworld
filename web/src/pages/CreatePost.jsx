@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { createPost } from '../services/firestore';
 import { uploadPostImages } from '../services/storage';
+import { analyzeImageForTags } from '../services/ai';
 import { MAX_CAPTION_LENGTH, MAX_IMAGES_PER_POST } from '../utils/constants';
 import './CreatePost.css';
 
@@ -21,6 +22,7 @@ const CreatePost = () => {
   const [location, setLocation] = useState('');
   const [speciesTag, setSpeciesTag] = useState('');
   const [uploading, setUploading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
 
   const handleImageSelect = (e) => {
     const files = Array.from(e.target.files);
@@ -47,6 +49,25 @@ const CreatePost = () => {
   const removeImage = (index) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
     setPreviews((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleAIFill = async () => {
+    if (images.length === 0) return;
+    setAiLoading(true);
+    try {
+      const result = await analyzeImageForTags(images[0]);
+      if (result) {
+        setCaption((prev) => prev ? `${prev}\n\n${result.description}` : result.description);
+        if (result.tags && result.tags.length > 0) {
+          setSpeciesTag(result.tags[0]);
+        }
+        toast.success('AI magic applied! ✨');
+      }
+    } catch (err) {
+      toast.error('AI analysis failed');
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -165,6 +186,15 @@ const CreatePost = () => {
 
         {/* Caption */}
         <div className="create-page__field">
+          {images.length > 0 && (
+            <button 
+              className="btn btn--secondary btn--sm create-page__ai-btn" 
+              onClick={handleAIFill}
+              disabled={aiLoading}
+            >
+              {aiLoading ? <Loader size={14} className="animate-spin" /> : '✨ Auto-fill with AI'}
+            </button>
+          )}
           <textarea
             className="input create-page__caption"
             placeholder="What did you observe in the wild today?"

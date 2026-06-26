@@ -1,6 +1,6 @@
 import imageCompression from 'browser-image-compression';
 
-const IMGBB_API_KEY = 'cf83dd6ca670d089bd03ddb55f04e858';
+const IMGBB_API_KEY = import.meta.env.VITE_IMGBB_API_KEY;
 
 /**
  * Compress an image file before upload
@@ -70,4 +70,12 @@ export const uploadPostImage = async (userId, file) => {
 export const uploadPostImages = async (userId, files) => {
   const uploadPromises = Array.from(files).map((file) => uploadPostImage(userId, file));
   return Promise.all(uploadPromises);
+};
+
+/**
+ * Upload a gallery image (higher quality for showcase)
+ */
+export const uploadGalleryImage = async (userId, file) => {
+  const compressed = await compressImage(file, 0.8, 2048);
+  return await uploadToImgBB(compressed);
 };

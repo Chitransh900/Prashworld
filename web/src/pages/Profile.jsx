@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MapPin, Share2, Grid3X3, Settings, X, MessageSquare } from 'lucide-react';
+import { ArrowLeft, MapPin, Share2, Grid3X3, Settings, X, MessageSquare, Bookmark } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
-import { getUserByUsername, getUserById, getUserPosts, checkIsFollowing, followUser, unfollowUser, getFollowers, getFollowing, getOrCreateChat } from '../services/firestore';
+import { getUserByUsername, getUserById, getUserPosts, checkIsFollowing, followUser, unfollowUser, getFollowers, getFollowing, getOrCreateChat, getSavedPosts } from '../services/firestore';
 import { formatCount, getInitials, getProfileURL } from '../utils/formatters';
 import './Profile.css';
 
@@ -15,7 +15,9 @@ const Profile = () => {
 
   const [profile, setProfile] = useState(null);
   const [posts, setPosts] = useState([]);
+  const [savedPosts, setSavedPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState('posts'); // 'posts' | 'saved'
   const [isFollowing, setIsFollowing] = useState(false);
   const [followLoading, setFollowLoading] = useState(false);
   const [showFollowersModal, setShowFollowersModal] = useState(false);
@@ -45,6 +47,12 @@ const Profile = () => {
         // Fetch posts
         const result = await getUserPosts(profileData.uid || profileData.id);
         setPosts(result.posts);
+
+        // Fetch saved posts if own profile
+        if (isOwnProfile && user) {
+          const savedResult = await getSavedPosts(user.uid);
+          setSavedPosts(savedResult.posts);
+        }
 
         // Check following status
         const targetId = profileData.uid || profileData.id;
@@ -159,7 +167,7 @@ const Profile = () => {
             <ArrowLeft size={22} strokeWidth={1.75} />
           </button>
           <span className="profile-page__topbar-name">{profile.displayName}</span>
-          <div style={{ width: 36 }} />
+          <div className="profile-page__topbar-spacer" />
         </header>
       )}
 
@@ -172,7 +180,7 @@ const Profile = () => {
               {profile.photoURL ? (
                 <img src={profile.photoURL} alt={profile.displayName} className="avatar avatar--xl" />
               ) : (
-                <div className="avatar-placeholder avatar--xl" style={{ fontSize: '28px' }}>
+                <div className="avatar-placeholder avatar--xl avatar-placeholder--lg-text">
                   {getInitials(profile.displayName)}
                 </div>
               )}
@@ -264,53 +272,98 @@ const Profile = () => {
 
         {/* Post Grid */}
         <div className="profile-page__tabs">
-          <button className="profile-page__tab profile-page__tab--active">
+          <button 
+            className={`profile-page__tab ${activeTab === 'posts' ? 'profile-page__tab--active' : ''}`}
+            onClick={() => setActiveTab('posts')}
+          >
             <Grid3X3 size={18} strokeWidth={1.75} />
             <span>Posts</span>
           </button>
+          {isOwnProfile && (
+            <button 
+              className={`profile-page__tab ${activeTab === 'saved' ? 'profile-page__tab--active' : ''}`}
+              onClick={() => setActiveTab('saved')}
+            >
+              <Bookmark size={18} strokeWidth={1.75} />
+              <span>Saved</span>
+            </button>
+          )}
         </div>
 
-        {posts.length === 0 ? (
-          <div className="profile-page__empty animate-fadeInUp">
-            <div className="profile-page__empty-icon">📸</div>
-            <h3 className="profile-page__empty-title">
-              {isOwnProfile ? 'No field notes yet' : 'No posts yet'}
-            </h3>
-            <p className="profile-page__empty-desc">
-              {isOwnProfile
-                ? 'Share your first nature moment with the world.'
-                : 'This explorer hasn\'t shared any field notes yet.'}
-            </p>
-            {isOwnProfile && (
-              <button
-                className="btn btn--primary"
-                onClick={() => navigate('/create')}
-              >
-                Create First Post
-              </button>
-            )}
-          </div>
+        {activeTab === 'posts' ? (
+          posts.length === 0 ? (
+            <div className="profile-page__empty animate-fadeInUp">
+              <div className="profile-page__empty-icon">📸</div>
+              <h3 className="profile-page__empty-title">
+                {isOwnProfile ? 'No field notes yet' : 'No posts yet'}
+              </h3>
+              <p className="profile-page__empty-desc">
+                {isOwnProfile
+                  ? 'Share your first nature moment with the world.'
+                  : 'This explorer hasn\'t shared any field notes yet.'}
+              </p>
+              {isOwnProfile && (
+                <button
+                  className="btn btn--primary"
+                  onClick={() => navigate('/create')}
+                >
+                  Create First Post
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="profile-grid">
+              {posts.map((post) => (
+                <button
+                  key={post.id}
+                  className="profile-grid__item"
+                  onClick={() => navigate(`/post/${post.id}`)}
+                >
+                  <img
+                    src={post.imageURLs?.[0]}
+                    alt={post.caption || 'Post'}
+                    className="profile-grid__image"
+                    loading="lazy"
+                  />
+                  <div className="profile-grid__overlay">
+                    <span>❤️ {formatCount(post.likeCount || 0)}</span>
+                    <span>💬 {formatCount(post.commentCount || 0)}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )
         ) : (
-          <div className="profile-grid">
-            {posts.map((post) => (
-              <button
-                key={post.id}
-                className="profile-grid__item"
-                onClick={() => navigate(`/post/${post.id}`)}
-              >
-                <img
-                  src={post.imageURLs?.[0]}
-                  alt={post.caption || 'Post'}
-                  className="profile-grid__image"
-                  loading="lazy"
-                />
-                <div className="profile-grid__overlay">
-                  <span>❤️ {formatCount(post.likeCount || 0)}</span>
-                  <span>💬 {formatCount(post.commentCount || 0)}</span>
-                </div>
-              </button>
-            ))}
-          </div>
+          savedPosts.length === 0 ? (
+            <div className="profile-page__empty animate-fadeInUp">
+              <div className="profile-page__empty-icon">🔖</div>
+              <h3 className="profile-page__empty-title">No saved posts</h3>
+              <p className="profile-page__empty-desc">
+                Posts you save will appear here for easy access. Only you can see what you've saved.
+              </p>
+            </div>
+          ) : (
+            <div className="profile-grid">
+              {savedPosts.map((post) => (
+                <button
+                  key={post.id}
+                  className="profile-grid__item"
+                  onClick={() => navigate(`/post/${post.id}`)}
+                >
+                  <img
+                    src={post.imageURLs?.[0]}
+                    alt={post.caption || 'Saved post'}
+                    className="profile-grid__image"
+                    loading="lazy"
+                  />
+                  <div className="profile-grid__overlay">
+                    <span>❤️ {formatCount(post.likeCount || 0)}</span>
+                    <span>💬 {formatCount(post.commentCount || 0)}</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )
         )}
       </div>
 
@@ -339,7 +392,7 @@ const Profile = () => {
                     {u.photoURL ? (
                       <img src={u.photoURL} alt={u.displayName} className="avatar avatar--sm" />
                     ) : (
-                      <div className="avatar-placeholder avatar--sm" style={{ fontSize: '12px' }}>{getInitials(u.displayName)}</div>
+                      <div className="avatar-placeholder avatar--sm avatar-placeholder--sm-text">{getInitials(u.displayName)}</div>
                     )}
                     <div className="profile-modal__user-info">
                       <span className="profile-modal__user-name">{u.displayName}</span>

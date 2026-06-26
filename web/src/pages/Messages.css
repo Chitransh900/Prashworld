@@ -342,3 +342,36 @@
   0%, 80%, 100% { transform: scale(0); opacity: 0; }
   40% { transform: scale(1); opacity: 1; }
 }
+
+/* ---- AI Chat Styles ---- */
+.avatar-placeholder--ai {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.chat-list-item__name--ai {
+  color: var(--color-primary);
+}
+
+.chat-area__name--ai {
+  color: var(--color-primary);
+}
+
+.message-bubble--typing {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  min-height: 38px;
+}
+
+.message-bubble--typing .typing-dot:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.message-bubble--typing .typing-dot:nth-child(2) {
+  animation-delay: 150ms;
+}
+
+.message-bubble--typing .typing-dot:nth-child(3) {
+  animation-delay: 300ms;
+}

@@ -142,11 +142,11 @@ const Messages = () => {
             className={`chat-list-item ${isAIChat ? 'chat-list-item--active' : ''}`}
             onClick={() => navigate(`/messages/${aiChatId}`)}
           >
-            <div className="avatar-placeholder avatar--md" style={{ background: 'var(--color-primary)', color: '#fff' }}>
+            <div className="avatar-placeholder avatar--md avatar-placeholder--ai">
               ✨
             </div>
             <div className="chat-list-item__info">
-              <span className="chat-list-item__name" style={{ color: 'var(--color-primary)' }}>Prashworld AI</span>
+              <span className="chat-list-item__name chat-list-item__name--ai">Prashworld AI</span>
               <span className="chat-list-item__last-message">Your AI Assistant</span>
             </div>
           </button>
@@ -205,7 +205,7 @@ const Messages = () => {
                     {getInitials(otherParticipant?.displayName || '?')}
                   </div>
                 )}
-                <span className="chat-area__name" style={isAIChat ? { color: 'var(--color-primary)' } : {}}>{otherParticipant?.displayName}</span>
+                <span className={`chat-area__name ${isAIChat ? 'chat-area__name--ai' : ''}`}>{otherParticipant?.displayName}</span>
               </div>
               {!isAIChat && (
                 <button className="icon-btn" onClick={handleDeleteChat} title="Delete Chat">
@@ -262,12 +262,12 @@ const Messages = () => {
               {isAITyping && (
                 <div className="message-bubble-wrapper message-theirs">
                   <div className="message-avatar-container">
-                    <div className="avatar-placeholder avatar--xs" style={{ background: 'var(--color-primary)', color: '#fff' }}>✨</div>
+                    <div className="avatar-placeholder avatar--xs avatar-placeholder--ai">✨</div>
                   </div>
-                  <div className="message-bubble first last" style={{ display: 'flex', gap: '4px', alignItems: 'center', minHeight: '38px' }}>
-                    <span className="typing-dot" style={{ animationDelay: '0ms' }}>.</span>
-                    <span className="typing-dot" style={{ animationDelay: '150ms' }}>.</span>
-                    <span className="typing-dot" style={{ animationDelay: '300ms' }}>.</span>
+                  <div className="message-bubble first last message-bubble--typing">
+                    <span className="typing-dot">.</span>
+                    <span className="typing-dot">.</span>
+                    <span className="typing-dot">.</span>
                   </div>
                 </div>
               )}

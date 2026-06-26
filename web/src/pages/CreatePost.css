@@ -228,3 +228,8 @@
   color: var(--text-secondary);
   font-weight: var(--font-medium);
 }
+
+.create-page__ai-btn {
+  align-self: flex-start;
+  margin-bottom: var(--space-2);
+}

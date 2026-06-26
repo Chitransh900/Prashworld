@@ -1,9 +1,9 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, MessageCircle, Share2, MapPin, MoreHorizontal, Trash2 } from 'lucide-react';
+import { Heart, MessageCircle, Share2, MapPin, MoreHorizontal, Trash2, Bookmark } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../contexts/ToastContext';
-import { likePost, unlikePost, deletePost } from '../../services/firestore';
+import { likePost, unlikePost, deletePost, savePost, unsavePost, checkIsSaved } from '../../services/firestore';
 import { formatTimeAgo, formatCount, getInitials, getPostURL } from '../../utils/formatters';
 import ShareModal from './ShareModal';
 import './PostCard.css';
@@ -19,6 +19,15 @@ const PostCard = ({ post, onDelete }) => {
   const [showShareModal, setShowShareModal] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [captionExpanded, setCaptionExpanded] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [saveAnimating, setSaveAnimating] = useState(false);
+
+  // Check saved status
+  useEffect(() => {
+    if (user && post.id) {
+      checkIsSaved(post.id, user.uid).then(setIsSaved).catch(console.error);
+    }
+  }, [user, post.id]);
 
   const handleLike = useCallback(async () => {
     if (!user) return;
@@ -48,6 +57,29 @@ const PostCard = ({ post, onDelete }) => {
 
   const handleShare = () => {
     setShowShareModal(true);
+  };
+
+  const handleSave = async () => {
+    if (!user) return;
+    setSaveAnimating(true);
+    setTimeout(() => setSaveAnimating(false), 500);
+
+    if (isSaved) {
+      setIsSaved(false);
+      try {
+        await unsavePost(post.id, user.uid);
+      } catch {
+        setIsSaved(true);
+      }
+    } else {
+      setIsSaved(true);
+      try {
+        await savePost(post.id, user.uid);
+        toast.success('Saved to Bookmarks');
+      } catch {
+        setIsSaved(false);
+      }
+    }
   };
 
   const handleDelete = async () => {
@@ -172,6 +204,19 @@ const PostCard = ({ post, onDelete }) => {
             aria-label="Share"
           >
             <Share2 size={20} strokeWidth={1.75} />
+          </button>
+        </div>
+        <div className="post-card__actions-right">
+          <button
+            className={`post-card__action-btn post-card__save-btn${isSaved ? ' post-card__save-btn--active' : ''}${saveAnimating ? ' post-card__like-btn--animating' : ''}`}
+            onClick={handleSave}
+            aria-label={isSaved ? 'Unsave' : 'Save'}
+          >
+            <Bookmark
+              size={22}
+              strokeWidth={isSaved ? 0 : 1.75}
+              fill={isSaved ? 'var(--text-primary)' : 'none'}
+            />
           </button>
         </div>
       </div>

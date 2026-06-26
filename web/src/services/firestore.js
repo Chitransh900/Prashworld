@@ -481,3 +481,104 @@ export const subscribeToMessages = (chatId, callback) => {
     callback(messages);
   });
 };
+
+/* ============================================
+   SMART GALLERY OPERATIONS
+   ============================================ */
+
+/**
+ * Add an image to the user's smart gallery
+ */
+export const addGalleryImage = async (userId, imageData) => {
+  const galleryRef = collection(db, 'users', userId, 'gallery');
+  const newImage = {
+    ...imageData,
+    createdAt: serverTimestamp(),
+  };
+
+  const docRef = await addDoc(galleryRef, newImage);
+  return { id: docRef.id, ...newImage };
+};
+
+/**
+ * Get all gallery images for a user (paginated)
+ */
+export const getGalleryImages = async (userId, pageSize = 24, lastDoc = null) => {
+  const galleryRef = collection(db, 'users', userId, 'gallery');
+  let q;
+
+  if (lastDoc) {
+    q = query(galleryRef, orderBy('createdAt', 'desc'), startAfter(lastDoc), limit(pageSize));
+  } else {
+    q = query(galleryRef, orderBy('createdAt', 'desc'), limit(pageSize));
+  }
+
+  const snapshot = await getDocs(q);
+  const images = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  const lastVisible = snapshot.docs[snapshot.docs.length - 1] || null;
+
+  return { images, lastVisible, hasMore: snapshot.docs.length === pageSize };
+};
+
+/**
+ * Delete a gallery image
+ */
+export const deleteGalleryImage = async (userId, imageId) => {
+  await deleteDoc(doc(db, 'users', userId, 'gallery', imageId));
+};
+
+/**
+ * Subscribe to gallery images in real-time
+ */
+export const subscribeToGallery = (userId, callback) => {
+  const galleryRef = collection(db, 'users', userId, 'gallery');
+  const q = query(galleryRef, orderBy('createdAt', 'desc'));
+
+  return onSnapshot(q, (snapshot) => {
+    const images = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    callback(images);
+  });
+};
+
+/* ============================================
+   SAVE OPERATIONS
+   ============================================ */
+
+export const savePost = async (postId, userId) => {
+  const savedRef = doc(db, 'users', userId, 'saved', postId);
+  await setDoc(savedRef, {
+    postId,
+    savedAt: serverTimestamp(),
+  });
+};
+
+export const unsavePost = async (postId, userId) => {
+  const savedRef = doc(db, 'users', userId, 'saved', postId);
+  await deleteDoc(savedRef);
+};
+
+export const checkIsSaved = async (postId, userId) => {
+  const savedRef = doc(db, 'users', userId, 'saved', postId);
+  const snap = await getDoc(savedRef);
+  return snap.exists();
+};
+
+export const getSavedPosts = async (userId, pageSize = 12, lastDoc = null) => {
+  const savedRef = collection(db, 'users', userId, 'saved');
+  let q;
+  if (lastDoc) {
+    q = query(savedRef, orderBy('savedAt', 'desc'), startAfter(lastDoc), limit(pageSize));
+  } else {
+    q = query(savedRef, orderBy('savedAt', 'desc'), limit(pageSize));
+  }
+  
+  const snapshot = await getDocs(q);
+  const postIds = snapshot.docs.map(doc => doc.data().postId);
+  
+  const posts = await Promise.all(postIds.map(id => getPostById(id)));
+  const validPosts = posts.filter(p => p !== null);
+  
+  const lastVisible = snapshot.docs[snapshot.docs.length - 1] || null;
+  return { posts: validPosts, lastVisible, hasMore: snapshot.docs.length === pageSize };
+};
+

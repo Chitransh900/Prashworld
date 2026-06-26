@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Search, PlusCircle, Heart, User, Settings, LogOut, Leaf, MessageSquare } from 'lucide-react';
+import { Home, Search, PlusCircle, Heart, User, Settings, LogOut, Leaf, MessageSquare, Sparkles } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { signOut } from '../../services/auth';
 import { useToast } from '../../contexts/ToastContext';
@@ -23,6 +23,7 @@ const Sidebar = () => {
     { path: '/home', icon: Home, label: 'Home' },
     { path: '/explore', icon: Search, label: 'Explore' },
     { path: '/messages', icon: MessageSquare, label: 'Messages' },
+    { path: '/gallery', icon: Sparkles, label: 'Smart Gallery' },
     { path: '/create', icon: PlusCircle, label: 'New Post' },
     { path: '/activity', icon: Heart, label: 'Activity' },
     { path: '/profile', icon: User, label: 'Profile' },
